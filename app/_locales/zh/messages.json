@@ -1,0 +1,19 @@
+{
+  "extensionName": {
+    "message": "万维网视口",
+    "description": "插件名称"
+  },
+  "menuItemExitFullScreen": {
+    "message": "退出全屏",
+    "description": "当前页面退出全屏"
+  },
+
+  "menuItemLoadSelectUrls": {
+    "message": "加载选定URLs",
+    "description": "加载选定URLs"
+  },
+  "menuItemAddToViewports": {
+    "message": "添加到视口",
+    "description": "添加到视口"
+  }
+}

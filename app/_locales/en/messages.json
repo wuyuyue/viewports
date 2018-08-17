@@ -1,0 +1,19 @@
+{
+  "extensionName": {
+    "message": "WWW Viewport",
+    "description": "Name of the extension"
+  },
+  "menuItemExitFullScreen": {
+    "message": "ExitFulScreen",
+    "description": "make current page exit fullscreen"
+  },
+
+  "menuItemLoadSelectUrls": {
+    "message": "LoadSelectUrls",
+    "description": "load Selection Urls"
+  },
+  "menuItemAddToViewports": {
+    "message": "AddToViewports",
+    "description": "Add to Viewports"
+  }
+}
