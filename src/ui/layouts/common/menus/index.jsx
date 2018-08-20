@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FloatAboveLayout } from '../../../components/layout'
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
-import extensionAPI  from '../../../utils/extension'
+// import extensionAPI  from '../../../utils/extension'
 
 import { FormattedMessage } from 'react-intl';
 class Menus extends React.Component {

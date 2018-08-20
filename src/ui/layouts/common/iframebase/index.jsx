@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Loading from '../../../components/loading'
 import  './index.styl'
 
-import extensionAPI  from '../../../utils/extension'
+// import extensionAPI  from '../../../utils/extension'
 
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 
@@ -451,6 +451,11 @@ class IframeBase extends React.Component {
     //     event.target.appendChild( dragged );
     // }
   }
+  componentDidCatch(error, info) {
+      // Display fallback UI
+      console.log(error,"componentDidCatch");
+      console.log(info,"componentDidCatch");
+  }
   render () {
     var self = this;
     // var viewLeft = this.state.fullScreen ? 0 : this.props.style.left;
@@ -514,7 +519,7 @@ class IframeBase extends React.Component {
         // onDragLeave={this.dragLeave.bind(this)}
         // onDrop={this.drop.bind(this)}
         className='iframeBase' ref='container' tabIndex={self.props.tabIndex} style={{ ...self.props.style, ...containerStyle  }} onFocus={this.focus.bind(this)} onBlur={this.blur.bind(this)} onMouseOver={this.mouseOver.bind(this)} onMouseOut={this.mouseOut.bind(this)} onDoubleClick={this.doubleClick.bind(this)}>
-        <div style={{ position: 'relative',width: '100%', height: '100%', boxSizing: 'border-box' }}>
+        <div style={{ position: 'relative',width: '100%', height: '100%', boxSizing: 'border-box', pointerEvents: "auto" }}>
           {
 
             //sandbox='allow-scripts allow-forms allow-popups allow-same-origin allow-top-navigaion'
@@ -526,7 +531,7 @@ class IframeBase extends React.Component {
             //       <div style={{ WebkitUserSelect: 'none', color: 'grey', fontSize: 12, transform: 'scale('+fixTransformScale.x+',' + fixTransformScale.y + ')' }}>this web-resource not suppot https, still want to load, switch location-bar to http://viewport.group</div>
             //     </div>
             //     :
-                <iframe sandbox='allow-scripts allow-forms allow-popups allow-same-origin' seamless src={resetUrlByRules(url)+'#uuid='+uuid} onLoad={() => { this.setState({startLoad:false}); }} onError={() => { this.setState({startLoad:false}); }} allowFullScreen frameBorder={0} style={{ backgroundColor: this.state.fullScreen?'white':'transparent', visibility :'visible', position: 'absolute', top: 0,left: 0,width: '100%',height: '100%',boxSizing: 'border-box' }}/>
+                <iframe sandbox='allow-scripts allow-forms allow-popups allow-same-origin' seamless src={resetUrlByRules(url)+'#uuid='+uuid} onLoad={() => { this.setState({startLoad:false}); }} onError={() => { this.setState({startLoad:false}); }} allowFullScreen frameBorder={0} style={{ backgroundColor: this.state.fullScreen?'white':'transparent', visibility :'visible', position: 'absolute', top: 0,left: 0,width: '100%',height: '100%',boxSizing: 'border-box', pointerEvents: isFullScreen?"auto":"none" }}/>
               :
               null
           }

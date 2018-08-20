@@ -11,24 +11,13 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link rel="stylesheet" href="webfonts/font-awesome.min.css"/>
-    <link rel="stylesheet" href="bundle.css">
-    <script src="scripts/extension.js"></script>
     <script>
       window.onerror=function(sMsg,sUrl,sLine){
         console.log(sMsg);
         console.log(sUrl);
         console.log(sLine);
       }
-      window.onbeforeunload = function (e) {
-        e = e || window.event;
-        if (e) {
-          console.log(e)
-          e.returnValue = 'Close';
-          console.log(e.returnValue);
-        }
-        // Chrome, Safari, Firefox 4+, Opera 12+ , IE 9+
-        return  'Close';
-      };
+
     </script>
   </head>
   <body>
@@ -37,7 +26,5 @@
         <img src='favicon.ico'/>
       </div>
     </div>
-
-    <script src="bundle.js"></script>
   </body>
 </html>

@@ -4,3 +4,7 @@ npm-debug.log
 /node_modules/
 /packages/
 /dist/
+/app/background.js
+/app/content.js
+/app/bundle.js
+/app/bundle.css

@@ -68,13 +68,18 @@ class App extends React.Component {
       }
     });
     var self = this;
-    self.props.appAction.listenUpdateViewList();
-    window.addEventListener('load',function(){
-      console.log('onload');
-      if(self.props.app.views===null){
-        self.props.appAction.queryViewList();
-      }
-    }, false);
+
+    if(typeof  browser!=="undefined"){
+      self.props.appAction.listenUpdateViewList();
+      window.addEventListener('load',function(){
+        console.log('onload');
+        if(self.props.app.views===null){
+          self.props.appAction.queryViewList();
+        }
+      }, false);
+    }
+
+
 
     window.addEventListener('keydown',function(event){
       if(event.keyCode === 27) {
@@ -94,6 +99,11 @@ class App extends React.Component {
     if (this.unlisten) {
       this.unlisten();
     }
+  }
+  componentDidCatch(error, info) {
+      // Display fallback UI
+      console.log(error,"componentDidCatch");
+      console.log(info,"componentDidCatch");
   }
   render() {
     var modalUI = null;

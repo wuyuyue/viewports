@@ -84,7 +84,7 @@ const installItems = [
       icon: 'images/install/opera_flat.png',
       name: 'Opera',
       label: 'Install Opera Extension',
-      installUrl: '',
+      installUrl: 'https://chrome.google.com/webstore/detail/viewport/npgjahajhclmlbijjeekjaodgmokngpp',
       picUrl: 'images/install/opera_installed.png'
     },
     {

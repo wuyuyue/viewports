@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions';
-import extensionAPI  from '../utils/extension'
+// import extensionAPI  from '../utils/extension'
 const {
   TOAST,
   SHOW_LOADING,

@@ -17,6 +17,7 @@ import styles from 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { FormattedMessage } from 'react-intl';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem, Divider } from 'rc-menu';
+import 'rc-dropdown/assets/index.css';
 
 
 class ETHModal extends React.Component{
@@ -62,7 +63,7 @@ class PortalIndex extends React.Component {
     for(var i=0;i<menus.length;i++){
       var menu = menus[i]
       menu.classList.remove('active');
-      if(id === menu.getAttribute("data").toLowerCase()){
+      if( menu.getAttribute("data") && id === menu.getAttribute("data").toLowerCase()){
         if(i===0){
           document.querySelector('.scrollContent>div').scrollTop=0;
         } else {
@@ -73,12 +74,13 @@ class PortalIndex extends React.Component {
       }
     }
   }
-  menuItemClick(e){
-    var target = e.nativeEvent.srcElement;
-    console.log(target);
-    // alert(target.parentElement.getAttribute("data"));
-    var id = target.parentElement.getAttribute("data").toLowerCase();
-    this.scrollTo(id);
+  menuItemClick(id){
+    // console.log(e);
+    // var target = e.nativeEvent.srcElement;
+    // console.log(target);
+    // // alert(target.parentElement.getAttribute("data"));
+    // var id = target.parentElement.getAttribute("data").toLowerCase();
+    this.scrollTo(id.toLowerCase());
     // console.log(target)
 
   }
@@ -127,7 +129,7 @@ class PortalIndex extends React.Component {
               <div className="collapse navbar-collapse" id="navbarCollapse">
                 <ul className="navbar-nav justify-content-end" style={{ width: '100%', fontSize: '20px', marginRight: 100 }}>
                   <li className="nav-item">
-                    <a className="nav-link active" href="javascript:void(-1)" data='Home' onClick={this.menuItemClick.bind(this)}>
+                    <a className="nav-link active" href="javascript:void(-1)" data='Home' onClick={this.menuItemClick.bind(this,"Home")}>
                       <FormattedMessage
                         id='app.portal.header.menu.home'
                         description='app.portal.header.menu.home'
@@ -136,7 +138,7 @@ class PortalIndex extends React.Component {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="javascript:void(-1)" data='Usercase' onClick={this.menuItemClick.bind(this)}>
+                    <a className="nav-link" href="javascript:void(-1)" data='Usercase' onClick={this.menuItemClick.bind(this,"Usercase")}>
                       <FormattedMessage
                         id='app.portal.header.menu.usercase'
                         description='app.portal.header.menu.usercase'
@@ -145,7 +147,7 @@ class PortalIndex extends React.Component {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="javascript:void(-1)" data='Features' onClick={this.menuItemClick.bind(this)}>
+                    <a className="nav-link" href="javascript:void(-1)" data='Features' onClick={this.menuItemClick.bind(this,"Features")}>
 
                       <FormattedMessage
                         id='app.portal.header.menu.features'
@@ -155,7 +157,7 @@ class PortalIndex extends React.Component {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="javascript:void(-1)" data='Install' onClick={this.menuItemClick.bind(this)}>
+                    <a className="nav-link" href="javascript:void(-1)" data='Install' onClick={this.menuItemClick.bind(this,"Install")}>
 
                       <FormattedMessage
                         id='app.portal.header.menu.install'
@@ -331,7 +333,7 @@ class PortalIndex extends React.Component {
                                       col2.split(' || ')[2]?
 
                                         col2.split(' || ')[0]==='video'?
-                                            <video controls="controls" src={col1.split(' || ')[2]} style={{ width: '100%', height: 'auto' }}/>
+                                            <video controls="controls" src={col2.split(' || ')[2]} style={{ width: '100%', height: 'auto' }}/>
                                             :
                                             <img src={col2.split(' || ')[2]} style={{ width: '100%', height: 'auto' }}/>
                                         :

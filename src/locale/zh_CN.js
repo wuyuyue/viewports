@@ -85,7 +85,7 @@ const installItems = [
       icon: 'images/install/opera_flat.png',
       name: 'Opera',
       label: '安装Opera插件',
-      installUrl: '',
+      installUrl: 'https://chrome.google.com/webstore/detail/viewport/npgjahajhclmlbijjeekjaodgmokngpp',
       picUrl: 'images/install/opera_installed.png'
     },
     {
@@ -230,7 +230,7 @@ const zh_CN = {
             "Q：你每天花多少时间浏览网页?",
             "A：可能不少于6小时每天.",
             "Q：如何减少这个时间?",
-            "A：||远离网络?|| 开玩笑, 因特网（WWWW）是伟大的创造与工具， 安装“视口”浏览器插件, 打开多视口在同一屏幕上，加速信息获取浏览,特别是当你有巨型屏或在客厅墙幕",
+            "A：||远离网络?|| 开个玩笑, 因特网（WWW）是伟大的创造与工具， 安装“视口”浏览器插件, 打开多视口在同一屏幕上，加速信息获取浏览,特别是当你有巨型屏或在客厅墙幕",
           ],
           "app.portal.usercase.items": usercaseItemsStr,
           "app.portal.feature.items": featureItemsStr,

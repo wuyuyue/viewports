@@ -3,23 +3,20 @@ var extensionURL = browser.extension.getURL('') + "index.html";
 
 // const host = '//viewport.group'
 var views = [];
-if(process.env.VENDOR === 'edge'){
 
-}else{
-  browser.runtime.onStartup.addListener(function () {
-    console.log("extension started: " + Date.now());
-    var getSuccess = function(items){
-      views = items && items.views || [];
-    }
-    if(process.env.VENDOR === 'edge'){
-      browser.storage.sync.get('views',getSuccess)
-    }else{
-      browser.storage.sync.get('views').then(getSuccess,(e)=>{console.log(e);views = [];});
-    }
+browser.runtime.onStartup && browser.runtime.onStartup.addListener(function () {
+  console.log("extension started: " + Date.now());
+  var getSuccess = function(items){
+    views = items && items.views || [];
+  }
+  if(process.env.VENDOR === 'edge'){
+    browser.storage.sync.get('views',getSuccess)
+  }else{
+    browser.storage.sync.get('views').then(getSuccess,(e)=>{console.log(e);views = [];});
+  }
 
-  });
+});
 
-}
 browser.runtime.onInstalled.addListener(function () {
   console.log("extension installed: " + Date.now());
   var getSuccess = function(items){
@@ -62,7 +59,8 @@ var update = function(views){
     }
   }
   if(process.env.VENDOR === 'edge'){
-    browser.tabs.query({ url: extensionURL },querySuccess);
+    browser.tabs.query({ },querySuccess);
+    // browser.tabs.sendMessage({'command':'UPDATE_VIEW_LIST',data: views},()=>{});
   }else{
     browser.tabs.query({ url: extensionURL }).then(querySuccess,(e)=>{console.log(e);});
   }
@@ -70,7 +68,8 @@ var update = function(views){
 }
 browser.runtime.onMessage.addListener(function(request, sender){
     // console.log(sender);
-  if(sender.url.indexOf(extensionURL)>-1 || sender.url.indexOf(extensionURL)>-1){
+  var senderUrl = sender.url || sender.tab.url;
+  if(senderUrl.indexOf(extensionURL)>-1 || senderUrl.indexOf(extensionURL)>-1){
     if(request.command === 'OPERATION_ON_VIEW') {
       var params = request.params;
       var frameId = params.frameId;
@@ -232,12 +231,12 @@ var fixViewSize = function(params){
     return result;
 }
 
-import {generatValidUrl} from '../../ui/utils/url'
+// import {generatValidUrl} from '../../ui/utils/url'
 browser.contextMenus.onClicked.addListener(function(info, tab){
   if (info.menuItemId === "pageAddToViewports") {
     console.log(info);
     var params= {
-      url: generatValidUrl(info.pageUrl),
+      url: info.pageUrl,
       title: '',
       width: 400,
       height: 300,
