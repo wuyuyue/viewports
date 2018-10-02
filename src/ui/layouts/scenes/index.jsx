@@ -16,6 +16,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {getAlreadyJoyrideFlag,setAlreadyJoyrideFlag} from '../../utils/storage'
 
+
 class Scenes extends React.Component {
   constructor(props) {
     super(props);
@@ -31,9 +32,12 @@ class Scenes extends React.Component {
         h: d.height
       }
     })
-    // console.log(initState,'arerweewrewrwe');
+    // //console.log(initState,'arerweewrewrwe');
     this.state = initState
 
+  }
+  componentWillUnmount(){
+    if(this._focusoutHander)window.removeEventListener('focusout',this._focusoutHander);
   }
   componentDidMount(){
     var self = this;
@@ -41,47 +45,55 @@ class Scenes extends React.Component {
 
     var title = intl.formatMessage({id: 'app.scenes.title'});
     document.title = title;
+    self._keyDownHander = function(event){
+      if (event.keyCode == 27) {
+        // console.log("keydown");
+        extensionAPI.pageExitFullScreen();
+        // self.exitFullscreen();
+      }
+    };
+    window.addEventListener('keydown', self._keyDownHander,false);
     // window.document.querySelector('title').innerHTML = title
 
-
-    var menusSelector = '.appMenus.addButton.fas.fa-plus-circle.fa-3x';
-    var drawerSwitchSelector = '.layout_drawer_menu svg';
-    var steps = [
-      {
-        title: intl.formatMessage({id: 'app.joyride.menus.title'}),
-        text: intl.formatMessage({id: 'app.joyride.menus.text'}),
-        selector: menusSelector,
-        allowClicksThruHole: false,
-        position: 'bottom',
-        style: {
-
-        }
-      },
-      {
-        title: intl.formatMessage({id: 'app.joyride.drawer.swtich.title'}),
-        text: intl.formatMessage({id: 'app.joyride.drawer.swtich.text'}),
-        selector: drawerSwitchSelector,
-        allowClicksThruHole: false,
-        position: 'top-left',
-        style: {
-
-        }
-      }
-    ];
-
-    if (!getAlreadyJoyrideFlag(menusSelector + drawerSwitchSelector)) {
-      if (this.props.appAction && this.props.appAction.setJoyride) {
-        this.props.appAction.setJoyride({
-          type: 'continuous',
-          steps: steps,
-          callback: function(result) {
-            if (result.type === 'finished') {
-              setAlreadyJoyrideFlag( menusSelector + drawerSwitchSelector);
-            }
-          }
-        });
-      }
-    }
+    //
+    // var menusSelector = '.appMenus.addButton.fas.fa-plus-circle.fa-3x';
+    // var drawerSwitchSelector = '.layout_drawer_menu svg';
+    // var steps = [
+    //   {
+    //     title: intl.formatMessage({id: 'app.joyride.menus.title'}),
+    //     text: intl.formatMessage({id: 'app.joyride.menus.text'}),
+    //     selector: menusSelector,
+    //     allowClicksThruHole: false,
+    //     position: 'bottom',
+    //     style: {
+    //
+    //     }
+    //   },
+    //   {
+    //     title: intl.formatMessage({id: 'app.joyride.drawer.swtich.title'}),
+    //     text: intl.formatMessage({id: 'app.joyride.drawer.swtich.text'}),
+    //     selector: drawerSwitchSelector,
+    //     allowClicksThruHole: false,
+    //     position: 'top-left',
+    //     style: {
+    //
+    //     }
+    //   }
+    // ];
+    //
+    // if (getAlreadyJoyrideFlag(".iframeBase") && !getAlreadyJoyrideFlag(menusSelector + drawerSwitchSelector)) {
+    //   if (this.props.appAction && this.props.appAction.setJoyride) {
+    //     this.props.appAction.setJoyride({
+    //       type: 'continuous',
+    //       steps: steps,
+    //       callback: function(result) {
+    //         if (result.type === 'finished') {
+    //           setAlreadyJoyrideFlag( menusSelector + drawerSwitchSelector);
+    //         }
+    //       }
+    //     });
+    //   }
+    // }
 
   }
   componentWillReceiveProps(nextProps){
@@ -89,6 +101,26 @@ class Scenes extends React.Component {
       const {intl} = nextProps;
       var title = intl.formatMessage({id: 'app.scenes.title'});
       document.title = title;
+    }
+    var self = this;
+    if(nextProps.app.views && nextProps.app.views.length ===0){
+      var selector1 = '.iframeBase';
+      var menusSelector = '.appMenus.addButton.fas.fa-plus-circle.fa-3x';
+      var drawerSwitchSelector = '.layout_drawer_menu svg';
+      if (!getAlreadyJoyrideFlag(selector1 + menusSelector + drawerSwitchSelector)) {
+        if(typeof self._alreadyAdd === 'undefined'){
+          if(self.props.app.appLanguage === "zh-CN"){
+            self.props.appAction.addView("https://www.iqiyi.com")
+            self.props.appAction.addView("https://bilibili.com")
+            self.props.appAction.addView("https://www.youku.com")
+          }else{
+            self.props.appAction.addView("https://youtube.com")
+          }
+
+          self._alreadyAdd = true;
+        }
+
+      }
     }
   }
   switchFullscreen(fullscreen,uuid){
@@ -213,7 +245,7 @@ class Scenes extends React.Component {
 
                   }
 
-                  // console.log(style);
+                  // //console.log(style);
                   var resizableOption={
                     key: d.uuid,
                     lockAspectRatio: false,
@@ -294,8 +326,8 @@ class Scenes extends React.Component {
                       minHeight: 0,
                     }
                   }
-                  console.log(style);
-                  console.log(resizableOption);
+                  //console.log(style);
+                  //console.log(resizableOption);
                   return (
                     <Resizable
                         {
@@ -304,7 +336,7 @@ class Scenes extends React.Component {
 
 
                         >
-                        <IframeBase appAction={self.props.appAction} tabIndex={i+1} key={d.uuid} uuid={d.uuid} frameId={d.frameId} url={d.url} style={style} switchFullscreen={self.switchFullscreen.bind(self)}/>
+                        <IframeBase app={self.props.app} appAction={self.props.appAction} tabIndex={i+1} title={d.title || (i+1)} key={d.uuid} uuid={d.uuid} frameId={d.frameId} url={d.url} style={style} switchFullscreen={self.switchFullscreen.bind(self)}/>
                     </Resizable>
 
                   )

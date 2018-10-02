@@ -3,7 +3,7 @@ var extensionURL = browser.extension.getURL('') + "index.html";
 
 // const host = '//viewport.group'
 var views = [];
-
+var installedTime;
 browser.runtime.onStartup && browser.runtime.onStartup.addListener(function () {
   console.log("extension started: " + Date.now());
   var getSuccess = function(items){
@@ -11,14 +11,58 @@ browser.runtime.onStartup && browser.runtime.onStartup.addListener(function () {
   }
   if(process.env.VENDOR === 'edge'){
     browser.storage.sync.get('views',getSuccess)
+
   }else{
     browser.storage.sync.get('views').then(getSuccess,(e)=>{console.log(e);views = [];});
+    // browser.storage.sync.get('installedTime',getInstalledTimeSuccess)
+  }
+  var setInstalledTime= function(){
+    installedTime = new Date().getTime();
+    if(process.env.VENDOR === 'edge'){
+      browser.storage.sync.set({'installedTime':installedTime},()=>{ console.log("browser.storage.sync.set");})
+    }else{
+      browser.storage.sync.set({'installedTime':installedTime}).then(()=>{console.log("browser.storage.sync.set");},(e)=>{console.log(e);});
+    }
+  }
+  var getInstalledTimeSuccess = function(items){
+    installedTime = items && items.installedTime;
+    if(!installedTime){
+      setInstalledTime();
+    }
+  }
+  if(process.env.VENDOR === 'edge'){
+    browser.storage.sync.get('installedTime',getInstalledTimeSuccess)
+  }else{
+    browser.storage.sync.get('installedTime').then(getInstalledTimeSuccess,(e)=>{console.log(e);setInstalledTime();});
+    // browser.storage.sync.get('installedTime',getInstalledTimeSuccess)
   }
 
 });
 
 browser.runtime.onInstalled.addListener(function () {
-  console.log("extension installed: " + Date.now());
+
+  var setInstalledTime= function(){
+    installedTime = new Date().getTime();
+    if(process.env.VENDOR === 'edge'){
+      browser.storage.sync.set({'installedTime':installedTime},()=>{ console.log("browser.storage.sync.set");})
+    }else{
+      browser.storage.sync.set({'installedTime':installedTime}).then(()=>{console.log("browser.storage.sync.set");},(e)=>{console.log(e);});
+    }
+  }
+  var getInstalledTimeSuccess = function(items){
+    installedTime = items && items.installedTime;
+    console.log("extension installed: " +installedTime);
+    if(!installedTime){
+      setInstalledTime();
+    }
+  }
+  if(process.env.VENDOR === 'edge'){
+    browser.storage.sync.get('installedTime',getInstalledTimeSuccess)
+  }else{
+    browser.storage.sync.get('installedTime').then(getInstalledTimeSuccess,(e)=>{console.log(e);setInstalledTime();});
+    // browser.storage.sync.get('installedTime',getInstalledTimeSuccess)
+  }
+
   var getSuccess = function(items){
       views = items && items.views || [];
       var querySuccess = function(tabs){
@@ -66,79 +110,146 @@ var update = function(views){
   }
 
 }
+
 browser.runtime.onMessage.addListener(function(request, sender){
     // console.log(sender);
   var senderUrl = sender.url || sender.tab.url;
   if(senderUrl.indexOf(extensionURL)>-1 || senderUrl.indexOf(extensionURL)>-1){
-    if(request.command === 'OPERATION_ON_VIEW') {
-      var params = request.params;
-      var frameId = params.frameId;
-      if(process.env.VENDOR === 'edge'){ // Messaging a specific frame is not yet supported.
-        browser.webNavigation.getAllFrames({
-          tabId: sender.tab.id
-        },function(frames){
-          for(var i=0;i<frames.length;i++){
-            var frame = frames[i];
-            if(frame.frameId === frameId){
-              var url = frame.url;
-              var newRequest = {
-                command: request.command,
-                params: Object.assign({ url: url},params)
+    if(request.command === 'QUERY_INSTALLED_TIME'){
+      // if(process.env.VENDOR === 'edge'){
+      //   browser.tabs.sendMessage(sender,{'command':'UPDATE_INSTALLED_TIME', data: installedTime},()=>{});
+      // }else{
+      //   browser.tabs.sendMessage(sender,{'command':'UPDATE_INSTALLED_TIME', data: installedTime}).then(()=>{},()=>{})
+      // }
+      // return Promise.resolve(installedTime+"");
+    }else{
+      if(request.command === 'OPERATION_ON_VIEW') {
+        var params = request.params;
+        var frameId = params.frameId;
+        var uuid = params.uuid;
+        var queryScenesSuccess = function(tabs){
+          // console.log(tabs);
+          var exist = false;
+          if(tabs&&tabs.length>0){
+            for(var i=0;i<tabs.length;i++){
+              var url = tabs[i].url;
+              if(url.endsWith('#/')){
+                exist = true;
+                var tabId = tabs[i].id;
+                var queryFrameSuccess = function(frames){
+                  // console.log(frames);
+                  for(var j=0;j<frames.length;j++){
+                    var frame = frames[j];
+                    // console.log(frame.url, uuid,frame.frameId,frame);
+                    if(frame.parentFrameId===0 && frame.url.indexOf(uuid)>-1){
+                      var frameId = frame.frameId;
+                      if(process.env.VENDOR === 'edge'){ // Messaging a specific frame is not yet supported.
+                        var newRequest = {
+                           command: request.command,
+                           params: Object.assign({ url: frame.url},params)
+                         }
+                        browser.tabs.sendMessage(tabId, newRequest,()=>{})
+                      }else{
+                        browser.tabs.sendMessage(tabId, request, { frameId: frameId }).then(()=>{},()=>{});
+                      }
+                      break;
+                    }
+                  }
+                };
+                if(process.env.VENDOR === 'edge'){ // Messaging a specific frame is not yet supported.
+                  browser.webNavigation.getAllFrames({
+                    tabId: tabId
+                  },function(frames){
+                    queryFrameSuccess(frames);
+                  })
+                }else{
+                  browser.webNavigation.getAllFrames({ tabId: tabId }).then(queryFrameSuccess,(error)=>{console.log(`Error: ${error}`);});
+                }
+                break;
+
               }
-              browser.tabs.sendMessage(sender.tab.id, newRequest,()=>{});
-              break;
             }
           }
-        });
-      }else{
-        browser.tabs.sendMessage(sender.tab.id, request, { frameId: frameId }).then(()=>{},()=>{})
-      }
-    }else if(request.command === 'OPERATION_ON_ALL_VIEWS') {
-      if(process.env.VENDOR === 'edge'){
-        browser.tabs.sendMessage(sender.tab.id, request,()=>{})
-      }else{
-        browser.tabs.sendMessage(sender.tab.id, request).then(()=>{},()=>{})
-      }
-    }else if(request.command === 'QUERY_VIEW_LIST') {
-      update(views);
-    } else{
-      if(request.command === 'ADD_VIEW'){
-          var view = request.params;
-          views.push(view)
-      } else if (request.command === 'BATCH_ADD_GIVEN_VIEWS'){
-          views = views.concat(request.params)
-      } else if (request.command === 'UPDATE_VIEW'){
-          var view = request.params;
-          var index = views.findIndex(function(value, index, arr) {
-            return value.uuid === view.uuid;
-          });
-          views[index] = {
-            ...views[index],
-            ...view
-          }
-      } else if (request.command === 'REMOVE_VIEW'){
-          var uuid = request.params.uuid;
-          var index = views.findIndex(function(value, index, arr) {
-            return value.uuid === uuid;
-          });
-          var removeItem = {
-            ... views[index]
-          }
-          views.splice(index,1);
-      } else if(request.command==='REMOVE_ALL_VIEW'){
-          views = [];
-      } else if (request.command === 'RESET_ALL_VIEW'){
-          views = [].concat(request.params.views);
-      }
-      if(process.env.VENDOR === 'edge'){
-        browser.storage.sync.set({'views':views},()=>{update(views);})
-      }else{
-        browser.storage.sync.set({'views':views}).then(()=>{update(views);},(e)=>{console.log(e);update(views);});
-      }
+          if(!exist){
 
+          }
+        }
+        if(process.env.VENDOR === 'edge'){
+          browser.tabs.query({ url: extensionURL },function(tabs){queryScenesSuccess(tabs);});
+        } else{
+          browser.tabs.query({ url: extensionURL }).then(queryScenesSuccess,(error)=>{console.log(`Error: ${error}`);});
+        }
+      }else if(request.command === 'OPERATION_ON_ALL_VIEWS' || request.command=== 'pageExitFullScreen') {
+        var queryScenesSuccess = function(tabs){
+          // console.log(tabs);
+          var exist = false;
+          if(tabs&&tabs.length>0){
+            for(var i=0;i<tabs.length;i++){
+              var url = tabs[i].url;
+              if(url.endsWith('#/')){
+                exist = true;
+                var tabId = tabs[i].id;
+                if(process.env.VENDOR === 'edge'){
+                  browser.tabs.sendMessage(tabId, request,()=>{})
+                }else{
+                  browser.tabs.sendMessage(tabId, request).then(()=>{},()=>{})
+                }
+                break;
+              }
+            }
+          }
+          if(!exist){
+
+          }
+        }
+        if(process.env.VENDOR === 'edge'){
+          browser.tabs.query({ url: extensionURL },function(tabs){
+            queryScenesSuccess(tabs);
+          });
+        } else{
+          browser.tabs.query({ url: extensionURL }).then(queryScenesSuccess,(error)=>{console.log(`Error: ${error}`);});
+        }
+      } else if(request.command === 'QUERY_VIEW_LIST') {
+        update(views);
+      } else {
+        if(request.command === 'ADD_VIEW'){
+            var view = request.params;
+            views.push(view)
+        } else if (request.command === 'BATCH_ADD_GIVEN_VIEWS'){
+            views = views.concat(request.params)
+        } else if (request.command === 'UPDATE_VIEW'){
+            var view = request.params;
+            var index = views.findIndex(function(value, index, arr) {
+              return value.uuid === view.uuid;
+            });
+            views[index] = {
+              ...views[index],
+              ...view
+            }
+        } else if (request.command === 'REMOVE_VIEW'){
+            var uuid = request.params.uuid;
+            var index = views.findIndex(function(value, index, arr) {
+              return value.uuid === uuid;
+            });
+            var removeItem = {
+              ... views[index]
+            }
+            views.splice(index,1);
+        } else if(request.command==='REMOVE_ALL_VIEW'){
+            views = [];
+        } else if (request.command === 'RESET_ALL_VIEW'){
+            views = [].concat(request.params.views);
+        }
+        if(process.env.VENDOR === 'edge'){
+          browser.storage.sync.set({'views':views},()=>{update(views);})
+        }else{
+          browser.storage.sync.set({'views':views}).then(()=>{update(views);},(e)=>{console.log(e);update(views);});
+        }
+      }
     }
+
   }
-  return Promise.resolve("Dummy response to keep the console quiet");
+  return Promise.resolve(installedTime);
 });
 
 // for iframe inner url change which would cause url in views change(also hack for firefox would not trigger onload after 1st time)
@@ -197,13 +308,23 @@ browser.webNavigation.onErrorOccurred.addListener(
 
 
 // menu in all page
-browser.contextMenus.create({
-    id: "pageAddToViewports",
-    title: browser.i18n.getMessage("menuItemAddToViewports"),
-    contexts: ["page"],
-    enabled: true
+try{
+  browser.contextMenus.create({
+      id: "pageAddToViewports",
+      title: browser.i18n.getMessage("menuItemAddToViewports"),
+      contexts: ["page"],
+      enabled: true
 
-});
+  },() => {
+    const err = browser.runtime.lastError;
+    if(err) {
+      console.warn('Context menu error ignored:', err);
+    }
+  });
+}catch(e){
+  console.log(e);
+}
+
 
 
 
@@ -234,7 +355,7 @@ var fixViewSize = function(params){
 // import {generatValidUrl} from '../../ui/utils/url'
 browser.contextMenus.onClicked.addListener(function(info, tab){
   if (info.menuItemId === "pageAddToViewports") {
-    console.log(info);
+    // console.log(info);
     var params= {
       url: info.pageUrl,
       title: '',

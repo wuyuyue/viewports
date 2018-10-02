@@ -11,5 +11,5 @@ var app =
             <Provider store={store}>
               { createRoutes(hashHistory) }
             </Provider>
-// console.log(renderToString(app));
+// //console.log(renderToString(app));
 ReactDOM.render(app, document.getElementById('app'));

@@ -3,9 +3,9 @@ const ipfs = ipfsAPI({host: '120.26.120.248', port: '5002', protocol: 'http'});
 //ipfs保存//
 exports.writeDataOnIpfs = (blob,account) => {
     return new Promise(function(resolve, reject) {
-      console.log(blob);
+      //console.log(blob);
       const descBuffer = Buffer.from(blob, 'utf-8');
-      console.log(descBuffer);
+      //console.log(descBuffer);
       const files = [
         {
           path: '/ViewportGroup/'+account+'.json',
@@ -13,7 +13,7 @@ exports.writeDataOnIpfs = (blob,account) => {
         }
       ]
       ipfs.add(files).then((response) => {
-        console.log(response)
+        //console.log(response)
         resolve(response[0].hash);
       }).catch((err) => {
         console.error(err)
@@ -24,11 +24,11 @@ exports.writeDataOnIpfs = (blob,account) => {
 
 exports.readDataOnIpfs = (account) => {
   return new Promise(function(resolve, reject) {
-    console.log('/ipns/QmdKXkeEWcuRw9oqBwopKUa8CgK1iBktPGYaMoJ4UNt1MP/'+account+'.json');
+    //console.log('/ipns/QmdKXkeEWcuRw9oqBwopKUa8CgK1iBktPGYaMoJ4UNt1MP/'+account+'.json');
     ipfs.cat('/ipns/QmdKXkeEWcuRw9oqBwopKUa8CgK1iBktPGYaMoJ4UNt1MP/'+account+'.json').then((stream) => {
-        console.log(stream);
+        //console.log(stream);
         let strContent = Utf8ArrayToStr(stream);
-        console.log(strContent);
+        //console.log(strContent);
         resolve(strContent);
     }).catch((err) => {
       console.error(err)

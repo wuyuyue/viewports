@@ -19,6 +19,9 @@ import { FormattedMessage } from 'react-intl';
 
 import {generatValidUrl}  from '../../utils/url'
 
+// import Dropdown from 'rc-dropdown';
+// import Menu, { Item as MenuItem, Divider } from 'rc-menu';
+// import 'rc-dropdown/assets/index.css';
 
 class SelectFromModal extends React.Component{
   constructor(props) {
@@ -32,7 +35,7 @@ class SelectFromModal extends React.Component{
   componentDidMount(){
     var self = this;
     window.addEventListener("message", function(event) {
-      // console.log(event.source);
+      // //console.log(event.source);
       if (event.source.parent != window)
         return;
       if(event.data.command === 'SELECTION_FROM'){
@@ -61,10 +64,10 @@ class SelectFromModal extends React.Component{
     // if(1){
       var selectFromIframe = document.querySelector('#selectFromIframe');
       // selectFromIframe.style.visibility='visible';
-      // console.log(selectFromIframe.parentNode);
+      // //console.log(selectFromIframe.parentNode);
       //
-      // console.log(selectFromIframe.parentNode.clientWidth);
-      // console.log(selectFromIframe.parentNode.clientHeight);
+      // //console.log(selectFromIframe.parentNode.clientWidth);
+      // //console.log(selectFromIframe.parentNode.clientHeight);
 
       self.setState({ startLoad: true })
       selectFromIframe.style.width = window.innerWidth+'px';
@@ -119,9 +122,14 @@ class SelectFromModal extends React.Component{
     var loadLabel = intl.formatMessage({id: 'app.config.selectmodal.operation.load'});
     return (
       <div id='selectFromModal'>
-        <div  onClick={(e)=>this.props.appAction.hideModal()} style={{width: 32, height: 32, float:'right', marginBottom: 4 }}>
-          <i className='fa fa-2x fa-window-close'/>
-        </div>
+        {
+          // <div  onClick={(e)=>this.props.appAction.hideModal()} style={{width: 32, height: 32, float:'right', marginBottom: 4 }}>
+          //   <i className='fa fa-2x fa-window-close'/>
+          // </div>
+          <div  style={{width: 32, height: 32, float:'right', marginBottom: 4 }}>
+
+          </div>
+        }
         <div className="input-group mb-3">
           <div className="input-group-prepend">
             <span className="input-group-text" id="basic-addon3">url</span>
@@ -202,7 +210,7 @@ class ConfigIndex extends React.Component {
     const {intl} = this.props;
     var title = intl.formatMessage({id: 'app.config.title'});
     document.title = title;
-    // console.log(this.props);
+    // //console.log(this.props);
     // if(this.props.app.token === null){
     //   alert(1234);
     // }
@@ -220,21 +228,21 @@ class ConfigIndex extends React.Component {
   }
   componentWillReceiveProps(nextProps){
     // if(this.props.app.views!==null || nextProps.app.views!==null){
-      if(this.props.app.token!== nextProps.app.token && nextProps.app.token === null){
-        // this.props.appAction.toast('未登录用户无法使用配置中心，请先登录',5000);
-        // this.props.appAction.showLoading();
-        // console.log(this.props.app);
-        this.props.appAction.showModal(UnLoginTipModal, {
-          style: {
-            width: 400
-          }
-          // appAction: this.props.appAction
-        });
-        setTimeout(()=>{
-          this.props.appAction.drawerOpenSet(true);
-        },500)
-
-      }
+      // if(this.props.app.token!== nextProps.app.token && nextProps.app.token === null){
+      //   // this.props.appAction.toast('未登录用户无法使用配置中心，请先登录',5000);
+      //   // this.props.appAction.showLoading();
+      //   // //console.log(this.props.app);
+      //   this.props.appAction.showModal(UnLoginTipModal, {
+      //     style: {
+      //       width: 400
+      //     }
+      //     // appAction: this.props.appAction
+      //   });
+      //   setTimeout(()=>{
+      //     this.props.appAction.drawerOpenSet(true);
+      //   },500)
+      //
+      // }
       if(this.props.app.token === null && nextProps.app.token){
         this.props.appAction.hideModal();
         // alert(this.props.app.licensed);
@@ -254,11 +262,12 @@ class ConfigIndex extends React.Component {
   renderEditable(cellInfo) {
     var self = this;
     const {intl} = this.props;
-    var viewTitlePlaceHolder = intl.formatMessage({id: 'app.config.tabel.row.label.title'});
+    var viewTitlePlaceHolder = intl.formatMessage({id: 'app.config.table.row.label.title'});
 
     return (
       <div className='vhCenter' style={{ width: "100%", height: '100%'}}>
-        <div className='operatableItem'
+        <div
+          //className='operatableItem'
           style={{ backgroundColor: "#fafafa", width: "100%", height: 40, lineHeight: '40px' }}
           contentEditable
           suppressContentEditableWarning
@@ -283,7 +292,7 @@ class ConfigIndex extends React.Component {
             if(cellInfo.column.id==='url'){
               item[cellInfo.column.id]=generatValidUrl(value);
             }
-            // console.log(item);
+            // //console.log(item);
             self.props.appAction.updateView(item);
           }}
           dangerouslySetInnerHTML={{
@@ -297,48 +306,62 @@ class ConfigIndex extends React.Component {
     );
   }
   openSelectFromModal(){
-    this.props.appAction.showModal(SelectFromModal, {
-      appAction: this.props.appAction,
-      intl: this.props.intl
+    var self = this;
+    self.props.appAction.showModal(SelectFromModal, {
+      hasClose: true,
+      closeModal: ()=>{self.props.appAction.hideModal()},
+      appAction: self.props.appAction,
+      intl: self.props.intl
     })
   }
+
   render () {
+    var self = this;
     const {intl} = this.props;
-    var mainLabel = intl.formatMessage({id: 'app.config.tabel.label.main'});
-    var titleLabel = intl.formatMessage({id: 'app.config.tabel.label.main.title'});
-    var urlLabel = intl.formatMessage({id: 'app.config.tabel.label.main.url'});
-    var sizeLabel = intl.formatMessage({id: 'app.config.tabel.label.size'});
-    var widthLabel = intl.formatMessage({id: 'app.config.tabel.label.size.width'});
-    var heightLabel = intl.formatMessage({id: 'app.config.tabel.label.size.height'});
-    var depthLabel = intl.formatMessage({id: 'app.config.tabel.label.size.depth'});
-    var positionLabel = intl.formatMessage({id: 'app.config.tabel.label.position'});
-    var xLabel = intl.formatMessage({id: 'app.config.tabel.label.position.x'});
-    var yLabel = intl.formatMessage({id: 'app.config.tabel.label.position.y'});
-    var zLabel = intl.formatMessage({id: 'app.config.tabel.label.position.z'});
+    var mainLabel = intl.formatMessage({id: 'app.config.table.label.main'});
+    var titleLabel = intl.formatMessage({id: 'app.config.table.label.main.title'});
+    var urlLabel = intl.formatMessage({id: 'app.config.table.label.main.url'});
+    var sizeLabel = intl.formatMessage({id: 'app.config.table.label.size'});
+    var widthLabel = intl.formatMessage({id: 'app.config.table.label.size.width'});
+    var heightLabel = intl.formatMessage({id: 'app.config.table.label.size.height'});
+    var depthLabel = intl.formatMessage({id: 'app.config.table.label.size.depth'});
+    var positionLabel = intl.formatMessage({id: 'app.config.table.label.position'});
+    var xLabel = intl.formatMessage({id: 'app.config.table.label.position.x'});
+    var yLabel = intl.formatMessage({id: 'app.config.table.label.position.y'});
+    var zLabel = intl.formatMessage({id: 'app.config.table.label.position.z'});
 
-    var operationLabel = intl.formatMessage({id: 'app.config.tabel.label.operation'});
-    var deleteLabel = intl.formatMessage({id: 'app.config.tabel.label.operation.delete'});
+    var operationLabel = intl.formatMessage({id: 'app.config.table.label.operation'});
+    var deleteLabel = intl.formatMessage({id: 'app.config.table.label.operation.delete'});
 
-    var previousTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.previousText'});
-    var nextTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.nextText'});
-    var loadingTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.loadingText'});
-    var noDataTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.noDataText'});
-    var pageTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.pageText'});
-    var ofTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.ofText'});
-    var rowsTextLabel = intl.formatMessage({id: 'app.config.tabel.label.option.rowsText'});
+    var previousTextLabel = intl.formatMessage({id: 'app.config.table.label.option.previousText'});
+    var nextTextLabel = intl.formatMessage({id: 'app.config.table.label.option.nextText'});
+    var loadingTextLabel = intl.formatMessage({id: 'app.config.table.label.option.loadingText'});
+    var noDataTextLabel = intl.formatMessage({id: 'app.config.table.label.option.noDataText'});
+    var pageTextLabel = intl.formatMessage({id: 'app.config.table.label.option.pageText'});
+    var ofTextLabel = intl.formatMessage({id: 'app.config.table.label.option.ofText'});
+    var rowsTextLabel = intl.formatMessage({id: 'app.config.table.label.option.rowsText'});
+
+    var operationRemoveLabel = intl.formatMessage({id: 'app.scenes.iframe.operation.remove'});
+    var operationReloadLabel = intl.formatMessage({id: 'app.scenes.iframe.operation.reload'});
+    var operationVideoMaxLabel = intl.formatMessage({id: 'app.scenes.iframe.operation.video.max'});
+    var operationVideoMinLabel = intl.formatMessage({id: 'app.scenes.iframe.operation.video.min'});
+    var operationVideoMuteLabel = intl.formatMessage({id: 'app.scenes.iframe.operation.video.mute'});
+    var operationVideoUnmuteLabel = intl.formatMessage({id: 'app.scenes.iframe.operation.video.unmute'});
 
 
     var drawerStyle = {
      width: '20%',
      backgroundColor: 'black'
    }
-   // console.log(this.props.app);
-   // console.log(this.props.app.drawerOpen,this.props.app.licensed ,'werwerewrewwre');
+   // //console.log(this.props.app);
+   // //console.log(this.props.app.drawerOpen,this.props.app.licensed ,'werwerewrewwre');
    var drawer =  <Drawer appAction={this.props.appAction} app={this.props.app}  location={this.props.location}/>
     return (
-      <Layout className='configIndex' drawer={drawer} drawerStyle={drawerStyle} drawerOpen={ this.props.app.drawerOpen || !this.props.app.licensed }>
+      <Layout className='configIndex' drawer={drawer} drawerStyle={drawerStyle}
+        // drawerOpen={ this.props.app.drawerOpen || !this.props.app.licensed }
+      >
         <div className="vhCenter" style={{ height: 50 }}>
-          <h5 className="text-monospace text-capitalize" style={{ margin: '0 auto' }}>
+          <h5  style={{ margin: '0 auto' }}>
             <FormattedMessage
               id='app.config.table.header'
               description='app.config.table.header'
@@ -373,6 +396,62 @@ class ConfigIndex extends React.Component {
                 />
             </span>
 
+            <span className='operatableItem' onClick={(e)=>{
+              // extensionAPI.pageExitFullScreen()
+              // window.postMessage({command: 'pageExitFullScreen'},"*");
+              extensionAPI.pageExitFullScreen();
+            }}>
+              <FormattedMessage
+                id='app.scenes.menus.pageExitFullScreen'
+                description='app.scenes.menus.pageExitFullScreen'
+                defaultMessage='pageExitFullScreen'
+                />
+            </span>
+            <span className='operatableItem' onClick={(e)=>{
+              extensionAPI.operationOnAllViews({
+                operation: 'videoFullScreen'
+              })
+            }}>
+              <FormattedMessage
+                id='app.scenes.menus.video.max'
+                description='app.scenes.menus.video.max'
+                defaultMessage='videosMax'
+                />
+            </span>
+            <span className='operatableItem' onClick={(e)=>{
+              extensionAPI.operationOnAllViews({
+                operation: 'videoExitFullScreen'
+              })
+            }}>
+              <FormattedMessage
+                id='app.scenes.menus.video.min'
+                description='app.scenes.menus.video.min'
+                defaultMessage='videosMin'
+                />
+            </span>
+            <span className='operatableItem' onClick={(e)=>{
+              extensionAPI.operationOnAllViews({
+                operation: 'videoMute'
+              })
+            }}>
+              <FormattedMessage
+                id='app.scenes.menus.video.mute'
+                description='app.scenes.menus.video.mute'
+                defaultMessage='videosMute'
+                />
+            </span>
+            <span className='operatableItem' onClick={(e)=>{
+              extensionAPI.operationOnAllViews({
+                operation: 'videoUnmute'
+              })
+            }}>
+              <FormattedMessage
+                id='app.scenes.menus.video.unmute'
+                description='app.scenes.menus.video.unmute'
+                defaultMessage='videosUnmute'
+                />
+            </span>
+
             {
 
               //<span className='operatableItem' onClick={e=>this.props.appAction.saveOnRemote(this.props.app.views,this.props.app.token)}>Save on Remote!</span>
@@ -393,7 +472,7 @@ class ConfigIndex extends React.Component {
                   {
                     Header: titleLabel,
                     accessor: "title",
-                    width: global.innerWidth/4,
+                    // width: global.innerWidth/4,
                     Cell: this.renderEditable
                   },
                   {
@@ -473,17 +552,64 @@ class ConfigIndex extends React.Component {
                 Header: operationLabel,
                 columns: [
                   {
-                    Header:deleteLabel,
+
+                    Header:<span style={{ fontSize: 13, fontStyle: 'italic'}}>
+                    {operationRemoveLabel+ " |" + operationReloadLabel+ " |" + operationVideoMaxLabel+ " |" + operationVideoMinLabel+ " |" + operationVideoMuteLabel+ " |" + operationVideoUnmuteLabel}
+                    </span>,
                     filterable: false,
+                    width: global.innerWidth/4,
                     Cell: row => (
-                      <div className='vhCenter' style={{width: '100%',height:'100%',textAlign:'center'}}>
-                        <span className='operatableItem' onClick={e=>this.props.appAction.removeView(row.original.uuid)}>
-                          <FormattedMessage
-                            id='app.config.tabel.row.label.delete'
-                            description='app.config.tabel.row.label.delete'
-                            defaultMessage='[delete]'
-                            />
-                         </span>
+                      <div  style={{ textAlign:'center'}}>
+                         <div className='operatableItem' onClick={(e)=>{
+                           self.props.appAction.removeView(row.original.uuid);
+                         }}>
+                           <i className="fas fa-trash"></i>
+                         </div>
+                         <div className='operatableItem' onClick={(e)=>{
+                           extensionAPI.operationOnView({
+                             frameId: row.original.frameId,
+                             uuid: row.original.uuid,
+                             operation: 'reload'
+                           })
+                         }}>
+                           <i className="fas fa-sync-alt"></i>
+                         </div>
+                         <div className='operatableItem' onClick={(e)=>{
+                           extensionAPI.operationOnView({
+                             frameId: row.original.frameId,
+                             uuid: row.original.uuid,
+                             operation: 'videoFullScreen'
+                           })
+                         }}>
+                           <i className="fas fa-window-maximize"></i>
+                         </div>
+                         <div className='operatableItem' onClick={(e)=>{
+                           extensionAPI.operationOnView({
+                             frameId: row.original.frameId,
+                             uuid: row.original.uuid,
+                             operation: 'videoExitFullScreen'
+                           })
+                         }}>
+                           <i className="fas fa-window-minimize"></i>
+                         </div>
+                         <div className='operatableItem' onClick={(e)=>{
+                           extensionAPI.operationOnView({
+                             frameId: row.original.frameId,
+                             uuid: row.original.uuid,
+                             operation: 'videoMute'
+                           })
+                         }}>
+                           <i className="fas fa-volume-down"></i>
+                         </div>
+                         <div className='operatableItem' onClick={(e)=>{
+                           extensionAPI.operationOnView({
+                             frameId: row.original.frameId,
+                             uuid: row.original.uuid,
+                             operation: 'videoUnmute'
+                           })
+                         }}>
+                           <i className="fas fa-volume-up"></i>
+                         </div>
                       </div>
                     )
                   }

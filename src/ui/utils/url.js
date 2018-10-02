@@ -9,7 +9,7 @@ exports.generatValidUrl = function(input){
     }
 
   }catch(e){
-    console.log(e);
+    //console.log(e);
     result = input;
   }
   return result;

@@ -13,7 +13,7 @@
     "description": "load Selection Urls"
   },
   "menuItemAddToViewports": {
-    "message": "AddToViewports",
-    "description": "Add to Viewports"
+    "message": "Add!",
+    "description": "AddToViewports"
   }
 }

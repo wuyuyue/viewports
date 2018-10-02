@@ -107,7 +107,7 @@ export default class Layout extends React.Component {
     }
     return (
       <div className={this.props.className?'layout_container ' + this.props.className: 'layout_container'} >
-        <div className='layout' style={{ ...layoutHasDrawerStyle, backgroundColor: this.props.bgColor}} onFocus={this.closeDrawer.bind(this)}>
+        <div className='layout' style={{ ...layoutHasDrawerStyle, backgroundColor: this.props.bgColor}} onClick={this.closeDrawer.bind(this)}>
           {drawerSwitch}
           {this.props.children}
         </div>

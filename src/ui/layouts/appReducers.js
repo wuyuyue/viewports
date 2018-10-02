@@ -5,10 +5,12 @@ const {
   SHOW_MODAL,
   HIDE_MODAL,
   TOKEN_SET,
+  TOKEN_BALANCE_SET,
   RESIZE_APP,
   SWITCH_LANGUAGE,
   DRAWER_OPEN_SET,
   QUERY_VIEW_LIST,
+  QUERY_INSTALLED_TIME,
   ADD_VIEW,
   REMOVE_VIEW,
   REMOVE_ALL_VIEW,
@@ -16,8 +18,15 @@ const {
   RESET_ALL_VIEW,
   SWITCH_VIEW_FULLSCREEN,
   SWITCH_VIEW_LAYOUT,
-  SET_JOYRIDE
+  SET_JOYRIDE,
+  SHOW_TRANSACTION,
+  HIDE_TRANSACTION,
+  SWITCH_NETWORK
 } = require('../redux/actionTypes').default;
+
+import { getSelectNetwork, getSelectAddress } from '../utils/storage'
+import { api } from '../utils/config'
+import ethereumAPI from '../utils/ethereumAPI'
 
 const initialState = {
   toast: {
@@ -33,11 +42,27 @@ const initialState = {
     ui: null,
     uiProps: null
   },
+  transaction: {
+    show: false,
+    data: null
+  },
   drawerOpen: false,
-  token: undefined,
+  token: getSelectAddress() || null,
+  tokenBalance: undefined,
   appWidth: 1024,
   appHeight: 800,
   appLanguage: navigator.language || 'en',
+  appWeb3AllPrivders:  api.appWeb3AllPrivders,
+  appWeb3Provider: getSelectNetwork().provider,
+  appDonationAddress: api.appDonationAddress,
+  appContractInfo: {
+    address: getSelectNetwork().contractAddress,
+    appId: new ethereumAPI.BN("0"),
+    creationAppFee: null,
+  },
+
+
+  installedTime: null,
   licensed: false,
   views: null,
   viewFullscreen: false,
@@ -110,11 +135,45 @@ export default function (state = initialState, action) {
           uiProps: null
         }
       };
+    case SHOW_TRANSACTION:
+      return {
+        ...state,
+        transaction: {
+          show: true,
+          data: {
+            ...state.transaction.data,
+            ...action.data
+          }
+        }
+      };
+    case HIDE_TRANSACTION:
+      return {
+        ...state,
+        transaction: {
+          show: false,
+          data: null
+        }
+      };
+    case SWITCH_NETWORK:
+      return {
+        ...state,
+        appWeb3Provider: action.data.provider,
+        appContractInfo: {
+          ...state.appContractInfo,
+          address: action.data.contractAddress,
+          creationAppFee: null,
+        }
+      }
     case TOKEN_SET:
       return {
         ...state,
         token: action.data
       };
+    case TOKEN_BALANCE_SET:
+      return {
+        ...state,
+        tokenBalance: action.data
+      }
     case RESIZE_APP:
       return {
         ...state,
@@ -148,6 +207,11 @@ export default function (state = initialState, action) {
         ...state,
         views: action.data
       };
+    case QUERY_INSTALLED_TIME:
+      return {
+        ...state,
+        installedTime: action.data
+      }
     case ADD_VIEW:
       return {
         ...state,

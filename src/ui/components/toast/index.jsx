@@ -29,7 +29,7 @@ class ToastItem extends Component {
       var update = function() {
         count++;
         self.setState(function(prevState, props) {
-          // console.log(count / maxFrame);
+          // //console.log(count / maxFrame);
           return { opacity: 1 - count / maxFrame }
         });
         if (count < maxFrame) {

@@ -6,7 +6,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 var HtmlWebpackLocalCachePlugin = require('./../portal/lib/html-webpack-local-cache-plugin');
 
-console.log(HtmlWebpackLocalCachePlugin,"HtmlWebpackLocalCachePlugin");
+//console.log(HtmlWebpackLocalCachePlugin,"HtmlWebpackLocalCachePlugin");
 
 module.exports = {
   entry: {

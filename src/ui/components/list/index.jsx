@@ -105,7 +105,7 @@ class ExtensiveListItem extends React.Component {
 
 //     if(this.props.fillEmpty){
 //       var fillNum = rows * columns - children.length;
-//       console.log(fillNum);
+//       //console.log(fillNum);
 //       var lastChild = children[children.length-1];
 //       var emptyElement = React.cloneElement(
 //         lastChild,

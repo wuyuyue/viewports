@@ -1,14 +1,14 @@
 var extensionURL = browser.extension.getURL('');
 
-browser.runtime.onMessage.addListener(function(m, sender){
-    if(m.command === 'UPDATE_VIEW_LIST'){
-      window.postMessage({
-        type: "UPDATE_VIEW_LIST",
-        data: m.data
-      },extensionURL);
-    }
-    return Promise.resolve("Dummy response to keep the console quiet");
-});
+// browser.runtime.onMessage.addListener(function(m, sender){
+//     if(m.command === 'UPDATE_VIEW_LIST'){
+//       window.postMessage({
+//         type: "UPDATE_VIEW_LIST",
+//         data: m.data
+//       },extensionURL);
+//     }
+//     return Promise.resolve("Dummy response to keep the console quiet");
+// });
 
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves

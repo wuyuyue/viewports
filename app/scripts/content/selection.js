@@ -9,7 +9,7 @@ browser.runtime.onMessage.addListener(function(m, sender){
     var children = commonAncestorContainer.querySelectorAll('a');
     var selectionViews=[];
     for(var i=0;i<children.length;i++){
-      console.log(children[i]);
+      // console.log(children[i]);
       var title = children[i].innerText;
       var url = children[i].getAttribute('href')
       selectionViews.push({
@@ -17,7 +17,7 @@ browser.runtime.onMessage.addListener(function(m, sender){
         url: url
       })
     }
-    console.log(selectionViews);
+    // console.log(selectionViews);
     window.parent.postMessage({
       command: "SELECTION_FROM",
       data: selectionViews

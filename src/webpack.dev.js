@@ -4,6 +4,9 @@ const path = require('path');
 
 module.exports = merge(common, {
   mode: 'development',
-  devtool: 'inline-source-map'
-
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: path.join(__dirname, "./portal"),
+    port: 3001
+  }
 });

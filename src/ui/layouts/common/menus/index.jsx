@@ -14,7 +14,7 @@ class Menus extends React.Component {
   }
   render () {
     // const {intl}=this.props;
-    // var defaultViewTitleLabe = intl.formatMessage({id: 'app.config.tabel.row.label.title'});
+    // var defaultViewTitleLabe = intl.formatMessage({id: 'app.config.table.row.label.title'});
 
     return (
       <FloatAboveLayout style={{  width: 48, height: 48, right: 20, top: 20 }}>
@@ -27,6 +27,21 @@ class Menus extends React.Component {
           <i className="appMenus addButton fas fa-plus-circle fa-3x" onClick={()=>{ this.props.appAction.addView()}}></i>
         </ContextMenuTrigger>
         <ContextMenu id='AppMenus' hideOnLeave={false}>
+          <MenuItem onClick={(e)=>{
+            // window.postMessage({command: 'pageExitFullScreen'},"*");
+            extensionAPI.pageExitFullScreen();
+          }}>
+            <i className="fas fa-arrow-circle-left">
+              <span style={{  marginLeft: 10, textAlign: 'left' }}>
+                <FormattedMessage
+                  id='app.scenes.menus.pageExitFullScreen'
+                  description='app.scenes.menus.pageExitFullScreen'
+                  defaultMessage='pageExitFullScreen'
+                  />
+
+              </span>
+            </i>
+          </MenuItem>
           <MenuItem onClick={(e)=>{
             extensionAPI.operationOnAllViews({
               operation: 'videoFullScreen'
@@ -90,6 +105,7 @@ class Menus extends React.Component {
               </span>
             </i>
           </MenuItem>
+
         </ContextMenu>
       </FloatAboveLayout>
     );

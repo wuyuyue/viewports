@@ -1,3 +1,4 @@
+import { api } from './config';
 
 function getKeyStores(){
   var result = [];
@@ -6,7 +7,7 @@ function getKeyStores(){
     try{
       result = JSON.parse(stores);
     }catch(e){
-      console.log(e);
+      //console.log(e);
       window.localStorage.removeItem('stores');
     }finally{
       return result;
@@ -37,7 +38,7 @@ exports.addKeyStore = (type,keyObject) => {
     try{
       result = JSON.parse(stores);
     }catch(e){
-      console.log(e);
+      //console.log(e);
       window.localStorage.removeItem('stores');
     }finally{
       result.push(item);
@@ -56,6 +57,25 @@ exports.setSelectAddress = (address) => {
 exports.clearAll = () => {
   window.localStorage.removeItem('selectAddress');
   window.localStorage.removeItem('stores');
+}
+
+
+exports.getSelectNetwork = () => {
+  var network = window.localStorage.getItem('selectNetwork');
+  var defaultNetwork = api.appWeb3AllPrivders[0];
+  if(network){
+    try{
+      network = JSON.parse(network);
+    }catch(e){
+      network = defaultNetwork;
+    }
+  } else{
+    network = defaultNetwork;
+  }
+  return network;
+}
+exports.setSelectNetwork= (network) => {
+  window.localStorage.setItem('selectNetwork',JSON.stringify(network));
 }
 
 /**
@@ -77,7 +97,7 @@ export function setAlreadyJoyrideFlag(selector) {
     window.localStorage.setItem(JOYRIDE_PREFIX + selector, true);
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
-      console.log('已经超出本地存储限定大小！');
+      //console.log('已经超出本地存储限定大小！');
       freeLocalStorage();
       window.localStorage.setItem(JOYRIDE_PREFIX + selector, true)
     }

@@ -40,7 +40,7 @@ class Modal extends Component {
   }
   render() {
     if (this.state.show === false) return null;
-    // console.log(this.props);
+    // //console.log(this.props);
     return (
       <div className='modal' onClick={()=>this.closeModal()}>
         <div className='modal_content vhCenter' style={{ marginTop: this.props.maskTopPoz ,backgroundColor: this.props.maskColor }}>

@@ -12,6 +12,6 @@ var app =
             </Provider>
 
 // import {renderToString} from 'react-dom/server'
-// console.log(renderToString(app));
+// //console.log(renderToString(app));
 
 ReactDOM.render(app, document.getElementById('app'));

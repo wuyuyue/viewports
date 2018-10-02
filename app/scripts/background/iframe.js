@@ -1,4 +1,4 @@
-var extensionURL = browser.extension.getURL('');
+var extensionURL = browser.extension.getURL('') + "index.html";
 
 /***
   for remove header in iframe which might bring security problem, it should be depend on user
@@ -38,19 +38,54 @@ browser.webRequest.onHeadersReceived.addListener(
 
 
 // menu in iframe
-browser.contextMenus.create({
-    id: "pageExitFullScreen",
-    title: browser.i18n.getMessage("menuItemExitFullScreen"),
-    contexts: ["frame"],
-    enabled: true
-});
+try{
+  browser.contextMenus.create({
+      id: "pageExitFullScreen",
+      title: browser.i18n.getMessage("menuItemExitFullScreen"),
+      contexts: ["frame"],
+      enabled: true
+  },() => {
+    const err = browser.runtime.lastError;
+    if(err) {
+      console.warn('Context menu error ignored:', err);
+    }
+  });
+}catch(e){
+  console.log(e);
+}
+
 browser.contextMenus.onClicked.addListener(function(info, tab){
   if (info.menuItemId === "pageExitFullScreen") {
-    if(process.env.VENDOR === 'edge'){
-      browser.tabs.sendMessage(tab.id,{command: 'pageExitFullScreen'},{  },()=>{})
-    }else{
-      browser.tabs.sendMessage(tab.id,{command: 'pageExitFullScreen'},{}).then(()=>{},()=>{})
+    var queryScenesSuccess = function(tabs){
+      // console.log(tabs);
+      var exist = false;
+      if(tabs&&tabs.length>0){
+        for(var i=0;i<tabs.length;i++){
+          var url = tabs[i].url;
+          if(url.endsWith('#/')){
+            exist = true;
+            var tabId = tabs[i].id;
+            if(process.env.VENDOR === 'edge'){
+              browser.tabs.sendMessage(tabId,{command: 'pageExitFullScreen'},{  },()=>{})
+            }else{
+              browser.tabs.sendMessage(tabId,{command: 'pageExitFullScreen'},{}).then(()=>{},()=>{})
+            }
+
+          }
+        }
+      }
+      if(!exist){
+
+      }
     }
+    if(process.env.VENDOR === 'edge'){
+      browser.tabs.query({ url: extensionURL },function(tabs){
+        queryScenesSuccess(tabs);
+      });
+    } else{
+      browser.tabs.query({ url: extensionURL }).then(queryScenesSuccess,(error)=>{console.log(`Error: ${error}`);});
+    }
+
   }
 });
 

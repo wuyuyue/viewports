@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions';
 // import extensionAPI  from '../utils/extension'
+// import * as request from '../utils/request';
 const {
   TOAST,
   SHOW_LOADING,
@@ -7,10 +8,12 @@ const {
   SHOW_MODAL,
   HIDE_MODAL,
   TOKEN_SET,
+  TOKEN_BALANCE_SET,
   DRAWER_OPEN_SET,
   OPERATION_FAIL,
   SWITCH_VIEW_FULLSCREEN,
   QUERY_VIEW_LIST,
+  QUERY_INSTALLED_TIME,
   ADD_VIEW,
   REMOVE_VIEW,
   REMOVE_ALL_VIEW,
@@ -19,8 +22,18 @@ const {
   RESIZE_APP,
   SWITCH_LANGUAGE,
   SWITCH_VIEW_LAYOUT,
-  SET_JOYRIDE
+  SET_JOYRIDE,
+  SHOW_TRANSACTION,
+  HIDE_TRANSACTION,
+  SWITCH_NETWORK
 } = require('../redux/actionTypes').default;
+
+export function switchNetwork(network){
+  return {
+    type: SWITCH_NETWORK,
+    data: network
+  }
+}
 
 export function setJoyride(data) {
   return {
@@ -106,6 +119,24 @@ export function tokenSet(token) {
     data: token
   }
 }
+export function tokenBalanceSet(balance) {
+  return {
+    type: TOKEN_BALANCE_SET,
+    data: balance
+  }
+}
+export function showTransaction(data) {
+  return {
+    type: SHOW_TRANSACTION,
+    data: data
+  }
+}
+export function hideTransaction() {
+  return {
+    type: HIDE_TRANSACTION
+  }
+}
+
 export function drawerOpenSet(drawerOpen) {
   return {
     type: DRAWER_OPEN_SET,
@@ -123,7 +154,7 @@ export function queryViewList(){
   return dispatch => {
     try{
       extensionAPI.queryViewList(function(data){
-        // console.log(data,'queryViewList');
+        // //console.log(data,'queryViewList');
         dispatch({
           type: QUERY_VIEW_LIST,
           data: data
@@ -161,11 +192,24 @@ export function listenUpdateViewList(){
       //     //}
       //   })
       // }
-      extensionAPI.listenUpdateViewList(function(data){
-        dispatch({
-          type: QUERY_VIEW_LIST,
-          data: data
-        })
+      extensionAPI.listenUpdateViewList(function(m){
+        console.log(m);
+        if(m.command === 'UPDATE_VIEW_LIST'){
+          dispatch({
+            type: QUERY_VIEW_LIST,
+            data: m.data
+          });
+        } else if(m.command ==='UPDATE_INSTALLED_TIME'){
+          dispatch({
+            type: QUERY_INSTALLED_TIME,
+            data: m.data
+          })
+        }
+
+        // dispatch({
+        //   type: QUERY_INSTALLED_TIME,
+        //   data: installedTime
+        // })
       });
     }catch(error){
       dispatch({
@@ -231,11 +275,11 @@ const blankView = {
 const uuidv1 = require('uuid/v1');
 
 var fixViewSize = function(params){
-    // console.log(params);
+    // //console.log(params);
     var result = {
       ...params
     };
-    // console.log(result,'1232321321323');
+    // //console.log(result,'1232321321323');
     if(result.width){
       result.width = parseFloat(result.width);
       result.width = parseFloat(result.width.toFixed(1))
@@ -251,7 +295,7 @@ var fixViewSize = function(params){
     return result;
 }
 export function batchAddGivenViews(array){
-  // console.log(extensionAPI);
+  // //console.log(extensionAPI);
   return dispatch => {
     try{
       // var params= {
@@ -265,15 +309,15 @@ export function batchAddGivenViews(array){
           uuid: uuidv1()
         })
       });
-      // console.log(viewsArray);
+      // //console.log(viewsArray);
       // if(global.chrome){
       //   var params= {
       //     ...blankView,
       //     uuid: uuidv1()
       //   }
-      //   console.log(params)
+      //   //console.log(params)
       //   chrome.runtime.sendMessage({command: "ADD_VIEW",params:params},function(json){
-      //     console.log(json);
+      //     //console.log(json);
       //     dispatch({
       //       type: ADD_VIEW,
       //       data: json.data
@@ -289,12 +333,13 @@ export function batchAddGivenViews(array){
     }
   }
 }
-export function addView(){
-  // console.log(extensionAPI);
+export function addView(url='about:blank'){
+  // //console.log(extensionAPI);
   return dispatch => {
     try{
       var params= {
         ...blankView,
+        url: url,
         uuid: uuidv1()
       }
       // if(global.chrome){
@@ -302,9 +347,9 @@ export function addView(){
       //     ...blankView,
       //     uuid: uuidv1()
       //   }
-      //   console.log(params)
+      //   //console.log(params)
       //   chrome.runtime.sendMessage({command: "ADD_VIEW",params:params},function(json){
-      //     console.log(json);
+      //     //console.log(json);
       //     dispatch({
       //       type: ADD_VIEW,
       //       data: json.data
@@ -327,7 +372,7 @@ export function updateView(view){
       //   // dispatch(showLoading());
       //   chrome.runtime.sendMessage({command: "UPDATE_VIEW",params:view},function(json){
       //     // dispatch(hideLoading());
-      //     console.log(json);
+      //     //console.log(json);
       //     dispatch({
       //       type: UPDATE_VIEW,
       //       data: json.data
@@ -349,6 +394,29 @@ export function updateView(view){
 }
 
 
+// export function getBlanceOfEther(address){
+//     //curl https://api.infura.io/v1/jsonrpc/mainnet/eth_getBalance?params=["0xc94770007dda54cF92009BFF0dE90c06F603a09f","latest"]
+//     // '{"jsonrpc":"2.0","method":"eth_getBalance","params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"],"id":1}'
+//
+//     // var params = {
+//     //   jsonrpc: "2.0",
+//     //   method: 'eth_getBalance',
+//     //   params: window.encodeURI([address,"latest"]),
+//     //   id: 1
+//     // }
+//     var url = "https://api.infura.io/v1/jsonrpc/mainnet/eth_getBalance?params=" + window.encodeURI(JSON.stringify(["0x"+address,"latest"]));
+//     return dispatch => {
+//       // dispatch(showLoading())
+//       return  request.commonGet(url,{},{}).then(data => {
+//           // //console.log(data);
+//           // dispatch(hideLoading())
+//           return data;
+//         }).catch(error => {
+//           // dispatch(hideLoading())
+//           return false;
+//         })
+//     }
+// }
 // const {writeDataOnIpfs,readDataOnIpfs} = require('../utils/ipfs');
 
 // const topic = 'ViewportGroup'
@@ -375,11 +443,11 @@ export function updateView(view){
 //    if (err) {
 //      throw err
 //    }
-//    console.log(identity,'identity')
+//    //console.log(identity,'identity')
 //  })
 //   var receiveMsg = function(msg){
-//     console.log(msg);
-//       console.log(msg.data.toString(),'12323232')
+//     //console.log(msg);
+//       //console.log(msg.data.toString(),'12323232')
 //       var receiveMsgs = JSON.parse(msg.data.toString().toString());
 //       if(!localMsgs){
 //         localMsgs = receiveMsgs;
@@ -414,11 +482,11 @@ export function updateView(view){
 //       }
 //       alert(node.isOnline());
 //       node.pubsub.publish(topic, node.types.Buffer.from(JSON.stringify(localMsgs)), (err) => {
-//         console.log(arguments,'abewrewr')
+//         //console.log(arguments,'abewrewr')
 //         if (err) {
 //           throw err
 //         }
-//         console.log(localMsgs);
+//         //console.log(localMsgs);
 //         // msg was broadcasted
 //       })
 //
@@ -432,16 +500,16 @@ export function updateView(view){
 //       //     return console.error('Error - ipfs files add', err, res)
 //       //   }
 //       //
-//       //   filesAdded.forEach((file) => console.log('successfully stored', file.hash))
+//       //   filesAdded.forEach((file) => //console.log('successfully stored', file.hash))
 //       // })
 //
 //     // dispatch(showLoading());
 //     // writeDataOnIpfs(json,account).then(function(data){
 //     //   dispatch(hideLoading());
-//     //   console.log(data);
+//     //   //console.log(data);
 //     // }).catch(function(error){
 //     //   dispatch(hideLoading());
-//     //   console.log(error);
+//     //   //console.log(error);
 //     //   dispatch({
 //     //    type: OPERATION_FAIL,
 //     //    error: error
@@ -454,14 +522,14 @@ export function updateView(view){
 // export function loadOnRemote(account){
 //   return dispatch => {
 //
-//     console.log(localMsgs);
+//     //console.log(localMsgs);
 //     // const node = new Ipfs({ repo: 'ipfs-' + account })
 //     // node.once('ready', () => {
 //     //   // node.files.cat('QmbGQoYX4qPpoYSoBtxPXAHJHkJSefBrRDAeZmviFvUfRk', function (err, data) {
 //     //   //   if (err) {
 //     //   //     return console.error('Error - ipfs files cat', err, res)
 //     //   //   }
-//     //   //   console.log(data.toString())
+//     //   //   //console.log(data.toString())
 //     //   // })
 //     // })
 //
@@ -472,15 +540,15 @@ export function updateView(view){
 //     //   //   var params= {
 //     //   //     views: JSON.parse(data)
 //     //   //   }
-//     //   //   console.log(params)
+//     //   //   //console.log(params)
 //     //   //   chrome.runtime.sendMessage({command: "RESET_ALL_VIEW",params:params},function(json){
-//     //   //     // console.log(json);
+//     //   //     // //console.log(json);
 //     //   //     dispatch(hideLoading());
 //     //   //     dispatch({
 //     //   //       type: RESET_ALL_VIEW,
 //     //   //       data: json.data
 //     //   //     });
-//     //   //     console.log(data);
+//     //   //     //console.log(data);
 //     //   //   });
 //     //   // }else{
 //     //   //   dispatch(hideLoading());
@@ -488,7 +556,7 @@ export function updateView(view){
 //     //
 //     // }).catch(function(error){
 //     //   dispatch(hideLoading());
-//     //   console.log(error);
+//     //   //console.log(error);
 //     //   dispatch({
 //     //    type: OPERATION_FAIL,
 //     //    error: error

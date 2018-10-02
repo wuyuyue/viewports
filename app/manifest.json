@@ -1,7 +1,7 @@
 {
   "name": "viewport",
-  "description": "open multi-viewports(webs) in one tab",
-  "version": "1.0.0",
+  "description": "open multi-viewports(webs) in one screen",
+  "version": "1.1.2",
   "short_name": "viewport",
   "manifest_version": 2,
   "default_locale": "en",

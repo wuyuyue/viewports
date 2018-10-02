@@ -94,14 +94,14 @@ class Tabs extends Component {
     var self = this;
     try {
       if (self.props.headerWidthUnit === 'fixed') {
-        // console.log(event.currentTarget);
-        //  console.log(self.refs.tabHeader.scrollLeft);
-        // console.log(event.currentTarget.offsetLeft);
-        // console.log(event.currentTarget.clientWidth);
+        // //console.log(event.currentTarget);
+        //  //console.log(self.refs.tabHeader.scrollLeft);
+        // //console.log(event.currentTarget.offsetLeft);
+        // //console.log(event.currentTarget.clientWidth);
         self.refs.tabHeader.scrollLeft = event.currentTarget.offsetLeft - self.refs.tabHeader.clientWidth / 2 + event.currentTarget.clientWidth / 2;
       }
     } catch (e) {
-      // console.log(e);
+      // //console.log(e);
     } finally {
       self.setState({ 'selectIndex': tabIndex }, function() {
         if (self.props.onTabSwitchCallBack) {
@@ -117,7 +117,7 @@ class Tabs extends Component {
     var children = React.Children.toArray(self.props.children || []);
 
     children.forEach(function(child, i) {
-      // console.log(child);
+      // //console.log(child);
       var title = child.props.title;
       var tabHeaderItemStyle = { ...style.tabHeader.item.base };
       var tabHeaderClassNames = 'tabHeader';

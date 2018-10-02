@@ -18,13 +18,14 @@ import { FormattedMessage } from 'react-intl';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem, Divider } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
-
+import LoginModal from '../common/loginModal'
+import TransactionModal from '../common/transactionModal/index.jsx'
+import { getSelectAddress } from '../../utils/storage'
 
 class ETHModal extends React.Component{
   render(){
     return (
       <div className='vhCenter' style={{ height: 250, padding: 10 }} onClick={()=>{this.props.appAction.hideModal()}}>
-        <div className='modal_close'>x</div>
         <img src='images/eth.png' style={{ width: 200, height: 200 }}/>
       </div>
     )
@@ -45,7 +46,7 @@ class PortalIndex extends React.Component {
   }
   // onScrollHandle(e){
   //   return;
-  //   console.log(e.srcElement.scrollTop);
+  //   //console.log(e.srcElement.scrollTop);
   //   var scrollTop = e.srcElement.scrollTop;
   //   var header = document.querySelector('#header');
   //   var dialog = document.querySelector('#dialog');
@@ -75,13 +76,13 @@ class PortalIndex extends React.Component {
     }
   }
   menuItemClick(id){
-    // console.log(e);
+    // //console.log(e);
     // var target = e.nativeEvent.srcElement;
-    // console.log(target);
+    // //console.log(target);
     // // alert(target.parentElement.getAttribute("data"));
     // var id = target.parentElement.getAttribute("data").toLowerCase();
     this.scrollTo(id.toLowerCase());
-    // console.log(target)
+    // //console.log(target)
 
   }
   componentWillReceiveProps(nextProps){
@@ -107,6 +108,8 @@ class PortalIndex extends React.Component {
     var usercaseItems = intl.formatMessage({id: 'app.portal.usercase.items'});
     var featureItems = intl.formatMessage({id: 'app.portal.feature.items'});
     var installItems = intl.formatMessage({id: 'app.portal.install.items'});
+    var donationSuccess = intl.formatMessage({id: 'app.portal.footer.donation.success'});
+
     return (
       <Layout className='portalIndex' bgColor='black'>
         <Content style={{ width: '100%', height: '100%' }}>
@@ -167,7 +170,7 @@ class PortalIndex extends React.Component {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="mailto:viewportgroup@outlook.com">
+                    <a className="nav-link" target="_blank" href="https://kiwiirc.com/client/irc.freenode.net/viewport">
 
                       <FormattedMessage
                         id='app.portal.header.menu.contact'
@@ -478,23 +481,131 @@ class PortalIndex extends React.Component {
                 </h5>
                 <ul className="list-unstyled text-small" style={{ fontSize: '0.8rem' }}>
                   <li>ETH:
-                    <span id='ethAddress' onDoubleClick={()=>{
+                    <span id='ethAddress' onDoubleClick={(e)=>{
                       // document.getElementById('ethAddress').focus();
                       document.execCommand("copy")
-                      this.props.appAction.toast('already copyed to clipboard')
+                      this.props.appAction.toast(this.props.intl.formatMessage({id: 'app.global.copy'}))
+
                     }}>
                       0x31bf67f8e79fb5c04500b1579580139a018cfc32
                     </span>
                   </li>
                   <li>
                       <img src='images/eth.png' onClick={()=>{
-                        this.props.appAction.showModal(ETHModal, {
-                          style: {
-                            width: 300
-                          },
-                          // hasClose: true,
-                          appAction: this.props.appAction
-                        });
+                        console.log(self.props.token);
+                        var openTransModal = function(){
+                          ethereumAPI.getBalance(getSelectAddress(),function(e,result){
+                            if(e){
+                              self.props.appAction.tokenBalanceSet(null);
+                            }else{
+                              self.props.appAction.tokenBalanceSet(ethereumAPI.fromWei(result.toString(),'ether'));
+                              self.props.appAction.showTransaction({
+                                from: "0x" + getSelectAddress(),
+                                to: self.props.appDonationAddress,//self.props.app.appDonationAddress,
+                                amount: "0.01", //ether
+                                // amount: ethereumAPI.fromWei(amount,"ether"),
+                                // gasUnits: Math.max(0,21000),
+                                callback: function(err,hash){
+                                  if(err){
+                                    self.props.appAction.toast(err.message);
+                                  }else{
+                                    self.props.appAction.hideTransaction();
+                                    self.props.appAction.toast(donationSuccess + hash,5000)
+                                    self.props.appAction.showModal(
+                                      TransactionModal,
+                                      {
+                                        style: {
+                                          width: "60%"
+                                        },
+                                        intl: self.props.intl,
+                                        appAction: self.props.appAction,
+                                        hash: hash,
+                                        hasClose: true,
+                                        closeModal: ()=>{self.props.appAction.hideModal()},
+                                      }
+                                    )
+                                    // setTimeout(()=>{
+                                    //   self.props.appAction.hideModal();
+                                    // },5000)
+                                  }
+                                }
+
+
+                              })
+
+                            }
+                          });
+                        }
+                        if(!self.props.token){
+                          self.props.appAction.showModal(
+                            LoginModal,
+                            {
+                              style: {
+                                width: '40%'
+                              },
+                              intl: self.props.intl,
+                              appAction: self.props.appAction,
+                              switchPanel: (panel)=>{
+
+                                if(panel==="home"){
+                                  self.props.appAction.tokenSet(getSelectAddress());
+                                  openTransModal();
+                                }
+                                //window.location.reload();
+                              },
+                              hasClose: true,
+                              closeModal: ()=>{self.props.appAction.hideModal()},
+                              exitCallback: function(){
+
+                              }
+
+                            });
+                        }else{
+
+
+                          openTransModal();
+                          // var from = "0x" +getSelectAddress();
+                          // var to = "0x31bf67f8e79fb5c04500b1579580139a018cfc32";
+                          // self.props.appAction.showTransaction({
+                          //   from: from,
+                          //   to: to,
+                          //   amount: ethereumAPI.fromWei("0.01","ether"),
+                          //   gasUnits: 21000,
+                          //   callback: function(e,hash){
+                          //     // alert(e);
+                          //       if(e){
+                          //         self.props.appAction.toast(e.message);
+                          //       }else{
+                          //
+                          //         self.props.appAction.hideTransaction();
+                          //         self.props.appAction.toast("applylicensepSuccessLabel")
+                          //         // self.props.appAction.showModal(
+                          //         //   TransactionModal,
+                          //         //   {
+                          //         //     style: {
+                          //         //       width: "60%"
+                          //         //     },
+                          //         //     intl: self.props.intl,
+                          //         //     appAction: self.props.appAction,
+                          //         //     hash: hash,
+                          //         //     hasClose: true,
+                          //         //     closeModal: ()=>{self.props.appAction.hideModal()},
+                          //         //   }
+                          //         // )
+                          //       }
+                          //   }
+                          // })
+                        }
+
+                        // this.props.appAction.showModal(ETHModal, {
+                        //   style: {
+                        //     width: 300
+                        //   },
+                        //   // hasClose: true,
+                        //   appAction: this.props.appAction,
+                        //   hasClose: true,
+                        //   closeModal: ()=>{self.props.appAction.hideModal()},
+                        // });
                       }} style={{ width: 80, height: 80 }}/>
                   </li>
                 </ul>
@@ -509,7 +620,7 @@ class PortalIndex extends React.Component {
                     />
                 </h5>
                 <ul className="list-unstyled text-small" style={{ fontSize: '0.8rem' }}>
-                  <li style={{ cursor: 'pointer' }} onClick={this.openNew.bind(this,"https://github.com/viewportgroup/web-extension")}>Git Hub</li>
+                  <li style={{ cursor: 'pointer' }} onClick={this.openNew.bind(this,"https://github.com/viewportgroup/licenseContract")}>License Price Smart Contract(GitHub)</li>
                 </ul>
               </div>
 
@@ -522,6 +633,6 @@ class PortalIndex extends React.Component {
 }
 import {injectIntl} from 'react-intl';
 
-export default connect(state => ({ appLanguage: state.app.appLanguage }), dispatch => ({
+export default connect(state => ({ appDonationAddress: state.app.appDonationAddress, token: state.app.token, appLanguage: state.app.appLanguage }), dispatch => ({
   appAction: bindActionCreators(appAction, dispatch)
 }))(injectIntl(PortalIndex))

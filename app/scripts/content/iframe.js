@@ -14,15 +14,20 @@ function resetAElements(document){
     }
   }
 }
-console.log('before onload');
+// console.log('before onload');
 window.onload=function(){
-  console.log('enter onload',window.location.href);
+  // console.log('enter onload',window.location.href);
   resetAElements(window.document);
 }
 window.addEventListener('keydown',function(event){
   if (event.keyCode == 27) {
-      window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
-      window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
+      // window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
+      // window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
+      if(process.env.VENDOR === 'edge'){
+        browser.runtime.sendMessage({command: "pageExitFullScreen"},()=>{});
+      }else{
+        browser.runtime.sendMessage({command: "pageExitFullScreen"}).then((data)=>{},(e)=>{});
+      }
   }
 }, false);
 window.addEventListener('mousedown',function(event){
@@ -30,8 +35,13 @@ window.addEventListener('mousedown',function(event){
 }, false)
 browser.runtime.onMessage.addListener(function(m, sender){
   if(m.command ==='pageExitFullScreen'){
-      window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
-      window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
+      // window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
+      // window.parent.postMessage({command: 'pageExitFullScreen'}, extensionURL);
+      if(process.env.VENDOR === 'edge'){
+        browser.runtime.sendMessage({command: "pageExitFullScreen"},()=>{});
+      }else{
+        browser.runtime.sendMessage({command: "pageExitFullScreen"}).then((data)=>{},(e)=>{});
+      }
   }
   return Promise.resolve("Dummy response to keep the console quiet");
 })
@@ -231,12 +241,14 @@ var response = function(operation){
     for(var i=0;i<videos.length;i++){
       var video = videos[i];
       video.muted = true;
+      video.volume = 0;
     }
   }else if(operation === 'videoUnmute'){
     var videos = document.querySelectorAll('video');
     for(var i=0;i<videos.length;i++){
       var video = videos[i];
       video.muted = false;
+      video.volume = 1;
     }
   }
 }
