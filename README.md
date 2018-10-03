@@ -4,7 +4,10 @@
   This could help user enjoy more webs(videos) at one time, browse the Internet efficiently ,
   especially useful in Conference/Hall Super screen
 
-  What and how to use "viewports" extension(video) https://www.youtube.com/embed/XG4VKbja_IM
+  What and how to use "viewports" extension(video)
+
+
+  [![Alt text for your video](https://img.youtube.com/vi/XG4VKbja_IM/0.jpg)](http://www.youtube.com/watch?v=XG4VKbja_IM)
 
   chrome extension：
 
